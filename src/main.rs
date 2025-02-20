@@ -26,7 +26,7 @@ fn main() -> Ev3Result<()> {
         right_motor.set_speed_sp(right_speed)?;right_motor.run_forever()?;
 
         // In the case that a double black occurs, increases the speed buffer by 75
-        // until such a time as
+        // until such a time as the sensors read a positive value without the buffer.
         if left_speed+adjustment_val < 0 && right_speed+adjustment_val < 0 {
             adjustment_val = 75;
         } else { adjustment_val = 0; }
