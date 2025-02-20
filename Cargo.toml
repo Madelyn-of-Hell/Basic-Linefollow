@@ -1,0 +1,8 @@
+[package]
+name = "Basic-Linefollow"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cmd_lib = "1.9.5"
+ev3dev-lang-rust = "0.14.0"
