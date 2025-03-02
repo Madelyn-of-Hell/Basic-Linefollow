@@ -62,6 +62,20 @@ fn main() -> Ev3Result<()> {
                 sleep(Duration::from_secs(3));
             }
         }
-
+        let buffer:String = format!(
+            "Adjustment Value: {}____\
+        Sees Green: {}____\
+        Left: {}____\
+        Left Green: {}____\
+        Right: {}_____t\
+        Right Green: {}____\r",
+            adjustment_val,
+            green.is_some(),
+            left_speed,
+            left_sensor.get_green()? - left_sensor.get_red()?,
+            right_speed,
+            right_sensor.get_green()? - right_sensor.get_red()?
+        );
+        print!("{buffer}");
     }
 }
