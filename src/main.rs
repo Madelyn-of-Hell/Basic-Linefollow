@@ -1,10 +1,26 @@
 extern crate ev3dev_lang_rust;
+
+use std::io;
+use std::io::Write;
 use ev3dev_lang_rust::sensors::{InfraredSensor, ColorSensor, SensorPort};
 use ev3dev_lang_rust::motors::{LargeMotor, MediumMotor, MotorPort};
 use ev3dev_lang_rust::{Ev3Result};
+use std::thread::sleep;
+use std::time::Duration;
 
+// A useful little enum so I can do numerical operations with sides but don't have to remember which is which
+#[repr(usize)]
+#[derive(Copy, Clone, Debug)]
+enum Side {
+    Left = 0,
+    Right = 1
+}
+impl Side {
+    fn val(&self) -> usize { self.clone() as usize }
+}
 // The speed value. Listed as 500 - {val} where val is how fast you go - and the point at which your speed becomes negative.
 const SPEED:i32 = 500 - 400;
+const ADJUSTMENT_VALUE:i32 = 125;
 fn main() -> Ev3Result<()> {
     // Declare Sensors
     let (left_sensor, right_sensor) = (ColorSensor::get(SensorPort::In2)?, ColorSensor::get(SensorPort::In1)?);
@@ -19,16 +35,15 @@ fn main() -> Ev3Result<()> {
     loop {
         left_speed = left_sensor.get_red()?-SPEED+adjustment_val;
         right_speed = right_sensor.get_red()?-SPEED+adjustment_val;
-        println!("Left: {}", left_speed);
-        println!("Left: {}", right_speed);
+
         // Adjusts speed for each motor independently according to red value
         left_motor.set_speed_sp(left_speed)?;left_motor.run_forever()?;
         right_motor.set_speed_sp(right_speed)?;right_motor.run_forever()?;
-
         // In the case that a double black occurs, increases the speed buffer by 75
         // until such a time as the sensors read a positive value without the buffer.
-        if left_speed+adjustment_val < 0 && right_speed+adjustment_val < 0 {
-            adjustment_val = 75;
+        if left_speed-adjustment_val < 0 && right_speed-adjustment_val < 0 {
+            adjustment_val = ADJUSTMENT_VALUE;
         } else { adjustment_val = 0; }
+
     }
 }
